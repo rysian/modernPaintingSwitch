@@ -1,0 +1,11 @@
+name: neoPaintingSwitch
+main: plugin.arcwolf.neopaintingswitch.neoPaintingSwitch
+version: 1.0
+permissions:
+    neopaintingswitch.*:
+        description: Wildcard option for comfort.
+        children:
+            neopaintingswitch.use: true
+    neopaintingswitch.use:
+        description: Allows the user to scroll through paintings.
+        default: op
