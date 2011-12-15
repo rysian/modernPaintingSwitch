@@ -53,7 +53,7 @@ public class npPlayerEvent extends PlayerListener {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
         try {
-            if (settings.block != null && !settings.block.equals(player.getTargetBlock(null, 100)) && settings.clicked) {
+            if (settings.block != null && settings.clicked && !settings.block.equals(player.getTargetBlock(null, 100))) {
                 player.sendMessage(ChatColor.RED + "Painting locked");
                 npSettings.playerSettings.get(player.getName()).painting = null;
                 npSettings.playerSettings.get(player.getName()).block = null;
