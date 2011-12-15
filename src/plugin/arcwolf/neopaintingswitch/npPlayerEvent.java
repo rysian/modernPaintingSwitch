@@ -39,6 +39,7 @@ public class npPlayerEvent extends PlayerListener {
             if (settings.clicked) {
                 player.sendMessage(ChatColor.RED + "Painting locked");
                 npSettings.playerSettings.get(player.getName()).painting = null;
+                npSettings.playerSettings.get(player.getName()).block = null;
                 npSettings.playerSettings.get(player.getName()).clicked = false;
             }
             else {
@@ -51,10 +52,15 @@ public class npPlayerEvent extends PlayerListener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
-        if (settings.block != null && !settings.block.equals(player.getTargetBlock(null, 100)) && settings.clicked) {
-            player.sendMessage(ChatColor.RED + "Painting locked");
-            npSettings.playerSettings.get(player.getName()).painting = null;
-            npSettings.playerSettings.get(player.getName()).clicked = false;
+        try {
+            if (settings.block != null && !settings.block.equals(player.getTargetBlock(null, 100)) && settings.clicked) {
+                player.sendMessage(ChatColor.RED + "Painting locked");
+                npSettings.playerSettings.get(player.getName()).painting = null;
+                npSettings.playerSettings.get(player.getName()).block = null;
+                npSettings.playerSettings.get(player.getName()).clicked = false;
+            }
+        } catch (Exception e){
+            // Do nothing
         }
     }
 
