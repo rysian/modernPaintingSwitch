@@ -54,12 +54,16 @@ public class npPlayerEvent extends PlayerListener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
-        if (settings.block != null && settings.location != null && settings.clicked && hasPlayerMovedSignificantly(event)) {
-            player.sendMessage(ChatColor.RED + "Painting locked");
-            npSettings.playerSettings.get(player.getName()).painting = null;
-            npSettings.playerSettings.get(player.getName()).block = null;
-            npSettings.playerSettings.get(player.getName()).clicked = false;
-            npSettings.playerSettings.get(player.getName()).location = null;
+        try {
+            if (settings.block != null && settings.location != null && settings.clicked && hasPlayerMovedSignificantly(event)) {
+                player.sendMessage(ChatColor.RED + "Painting locked");
+                npSettings.playerSettings.get(player.getName()).painting = null;
+                npSettings.playerSettings.get(player.getName()).block = null;
+                npSettings.playerSettings.get(player.getName()).clicked = false;
+                npSettings.playerSettings.get(player.getName()).location = null;
+            }
+        } catch (Exception e) {
+            // Do Nothing
         }
     }
 
@@ -106,16 +110,12 @@ public class npPlayerEvent extends PlayerListener {
     }
 
     private boolean hasPitchChangedSignificantly(int oldPlayerPitch, int newPlayerPitch) {
-        oldPlayerPitch += 1;
-        newPlayerPitch += 1;
         if (oldPlayerPitch < newPlayerPitch) {
             int temp = oldPlayerPitch;
             oldPlayerPitch = newPlayerPitch;
             newPlayerPitch = temp;
         }
-        if ((oldPlayerPitch - newPlayerPitch) > 30) {
-            return true;
-        }
+        if ((oldPlayerPitch - newPlayerPitch) > 30) { return true; }
         return false;
     }
 
@@ -127,9 +127,7 @@ public class npPlayerEvent extends PlayerListener {
             oldYaw = newYaw;
             newYaw = temp;
         }
-        if (oldYaw % newYaw > 30) {
-            return true;
-        }
+        if (oldYaw % newYaw > 30) { return true; }
         return false;
     }
 
