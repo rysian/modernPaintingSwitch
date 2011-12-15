@@ -2,6 +2,7 @@ package plugin.arcwolf.neopaintingswitch;
 
 import java.util.Hashtable;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ public class npSettings {
     public boolean clicked = false;
     public Block block = null;
     public Painting painting = null;
+    public Location location = null;
     
     public static npSettings getSettings(Player player){
         npSettings settings = (npSettings) playerSettings.get(player.getName());

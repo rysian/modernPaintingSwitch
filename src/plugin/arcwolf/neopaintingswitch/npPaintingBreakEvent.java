@@ -19,6 +19,7 @@ public class npPaintingBreakEvent extends EntityListener {
                 if (settings.painting != null && settings.painting.getEntityId() == event.getPainting().getEntityId()) {
                     npSettings.playerSettings.get(player.getName()).painting = null;
                     npSettings.playerSettings.get(player.getName()).block = null;
+                    npSettings.playerSettings.get(player.getName()).location = null;
                     npSettings.playerSettings.get(player.getName()).clicked = false;
                 }
             }
@@ -30,6 +31,7 @@ public class npPaintingBreakEvent extends EntityListener {
                 if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == event.getPainting().getEntityId()) {
                     npSettings.playerSettings.get(playerName).painting = null;
                     npSettings.playerSettings.get(playerName).block = null;
+                    npSettings.playerSettings.get(playerName).location = null;
                     npSettings.playerSettings.get(playerName).clicked = false;
                     return;
                 }
