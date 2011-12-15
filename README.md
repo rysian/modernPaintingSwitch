@@ -11,6 +11,12 @@ Features:
 clicking at them and using the mouse wheel to scroll through paintings.
 * Permissions support "neopaintingswitch.use".
 
-Version 1.0:
+Version 1.2:
 ============
+Significantly reduced the number of calls to getTargetBlock(). Now only calls when precise conditions are met and only once.
+
+Version 1.1
+May have fixed a exception
+
+Version 1.0
 * First release.
