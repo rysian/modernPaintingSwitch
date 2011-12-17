@@ -23,7 +23,7 @@ public class npPlayerEvent extends PlayerListener {
 
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
-        if (entity instanceof Painting && plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use")) {
+        if (entity instanceof Painting && (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
             Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
             for(Entry<String, npSettings> set : keys) {
@@ -98,7 +98,7 @@ public class npPlayerEvent extends PlayerListener {
         if (hasYawChangedSignificantly(oldPlayerYaw, newPlayerYaw) || hasPitchChangedSignificantly(oldPlayerPitch, newPlayerPitch)) {
             if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; }
         }
-        if (((newPlayerYaw < 315 && newPlayerYaw > 225) || (newPlayerYaw < 135 && newPlayerYaw > 45)) &&
+        if (((newPlayerYaw <= 315 && newPlayerYaw >= 225) || (newPlayerYaw <= 135 && newPlayerYaw >= 45)) &&
                 ((oldPlayerPosX % newPlayerPosX > 7) || (oldPlayerPosY % newPlayerPosY > 2) || (oldPlayerPosZ % newPlayerPosZ > 2))) { // -X or +X direction
             if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; }
         }
