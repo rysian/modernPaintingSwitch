@@ -8,8 +8,6 @@ import org.anjocaido.groupmanager.GroupManager;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -40,10 +38,8 @@ public class neoPaintingSwitch extends JavaPlugin {
         setupConfig();
         getPermissionsPlugin();
 
-        pm.registerEvent(Type.PLAYER_INTERACT_ENTITY, new npPlayerEvent(this), Priority.Normal, this);
-        pm.registerEvent(Type.PAINTING_BREAK, new npPaintingBreakEvent(), Priority.Normal, this);
-        pm.registerEvent(Type.PLAYER_MOVE, new npPlayerEvent(this), Priority.Normal, this);
-        pm.registerEvent(Type.PLAYER_ITEM_HELD, new npPlayerEvent(this), Priority.Normal, this);
+        pm.registerEvents(new npPlayerEvent(this), this);
+        pm.registerEvents(new npPaintingBreakEvent(), this);
 
         LOGGER.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
     }

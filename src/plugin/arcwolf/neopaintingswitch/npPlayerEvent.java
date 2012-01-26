@@ -8,12 +8,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class npPlayerEvent extends PlayerListener {
+public class npPlayerEvent implements Listener {
 
     private neoPaintingSwitch plugin;
 
@@ -21,7 +22,10 @@ public class npPlayerEvent extends PlayerListener {
         this.plugin = plugin;
     }
 
+    @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.isCancelled())
+            return;
         Entity entity = event.getRightClicked();
         if (entity instanceof Painting && (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
@@ -51,7 +55,10 @@ public class npPlayerEvent extends PlayerListener {
         }
     }
 
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.isCancelled())
+            return;
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
         try {
@@ -131,6 +138,7 @@ public class npPlayerEvent extends PlayerListener {
         return false;
     }
 
+    @EventHandler
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);

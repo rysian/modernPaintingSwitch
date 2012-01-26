@@ -7,9 +7,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 
-
 public class npSettings {
-    public static Hashtable<String, npSettings> playerSettings = new Hashtable<String, npSettings>();
+    static Hashtable<String, npSettings> playerSettings = new Hashtable<String, npSettings>();
     //command used
     public boolean clicked = false;
     public Block block = null;

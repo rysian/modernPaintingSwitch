@@ -4,13 +4,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 
-public class npPaintingBreakEvent extends EntityListener {
+public class npPaintingBreakEvent implements Listener {
 
+    @EventHandler
     public void onPaintingBreak(PaintingBreakEvent event) {
+        if (event.isCancelled())
+            return;
         if (event instanceof PaintingBreakByEntityEvent) {
             PaintingBreakByEntityEvent entityBreakEvent = (PaintingBreakByEntityEvent) event;
             if (entityBreakEvent.getRemover() instanceof Player) {
