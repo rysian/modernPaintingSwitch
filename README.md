@@ -17,7 +17,6 @@ updated for bukkit 1.1 and mc 1.1 new event handlers
 also respect for outside event cancel events
 
 Version 1.3:
-============
 PermissionsEx support & new config option to turn off permissions and allow Free For All mode.
 
 Version 1.2:
