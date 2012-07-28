@@ -3,6 +3,7 @@ package plugin.arcwolf.neopaintingswitch;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +16,7 @@ public class npPaintingBreakEvent implements Listener {
     public void onPaintingBreak(PaintingBreakEvent event) {
         if (event.isCancelled())
             return;
+        Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
         if (event instanceof PaintingBreakByEntityEvent) {
             PaintingBreakByEntityEvent entityBreakEvent = (PaintingBreakByEntityEvent) event;
             if (entityBreakEvent.getRemover() instanceof Player) {
@@ -26,10 +28,19 @@ public class npPaintingBreakEvent implements Listener {
                     npSettings.playerSettings.get(player.getName()).location = null;
                     npSettings.playerSettings.get(player.getName()).clicked = false;
                 }
+                else {
+                    for(Entry<String, npSettings> set : keys) {
+                        String playerName = set.getKey();
+                        if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == event.getPainting().getEntityId() && !playerName.equals(player.getName())) {
+                            player.sendMessage(ChatColor.RED + "This painting is being edited by " + ChatColor.WHITE + set.getKey());
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
             }
         }
         else {
-            Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
             for(Entry<String, npSettings> set : keys) {
                 String playerName = set.getKey();
                 if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == event.getPainting().getEntityId()) {

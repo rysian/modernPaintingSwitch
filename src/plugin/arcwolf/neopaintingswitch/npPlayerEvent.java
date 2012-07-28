@@ -33,7 +33,7 @@ public class npPlayerEvent implements Listener {
             for(Entry<String, npSettings> set : keys) {
                 String playerName = set.getKey();
                 if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == entity.getEntityId() && !playerName.equals(player.getName())) {
-                    player.sendMessage(ChatColor.RED + playerName + " is already editing this painting.");
+                    player.sendMessage(playerName + ChatColor.RED + " is already editing this painting.");
                     return;
                 }
             }
