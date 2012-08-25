@@ -1,12 +1,9 @@
 package plugin.arcwolf.neopaintingswitch;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.anjocaido.groupmanager.GroupManager;
 import org.bukkit.Server;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -16,17 +13,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class neoPaintingSwitch extends JavaPlugin {
 
     private GroupManager groupManager;
     private Permissions permissionsPlugin;
     private PermissionsEx permissionsExPlugin;
+    public WorldGuardPlugin wgp;
 
     private boolean isError = false;
     public boolean free4All = false;
     private boolean permissionsSet = false;
     private Server server;
+    public boolean worldguard = false;
 
     public static final Logger LOGGER = Logger.getLogger("Minecraft.neoPaintingSwitch");
 
@@ -35,8 +35,9 @@ public class neoPaintingSwitch extends JavaPlugin {
         server = this.getServer();
         PluginDescriptionFile pdfFile = getDescription();
         PluginManager pm = getServer().getPluginManager();
-        setupConfig();
         getPermissionsPlugin();
+        wgp = getWorldGuard();
+        worldguard = wgp != null;
 
         pm.registerEvents(new npPlayerEvent(this), this);
         pm.registerEvents(new npPaintingBreakEvent(), this);
@@ -50,28 +51,10 @@ public class neoPaintingSwitch extends JavaPlugin {
         LOGGER.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is disabled!");
     }
 
-    public void setupConfig()
-    {
-        File configFile = new File(this.getDataFolder() + "/config.yml");
-        FileConfiguration config = this.getConfig();
-        if (!configFile.exists())
-        {
-            config.set("free4All", Boolean.valueOf(false));
-            try
-            {
-                config.save(configFile);
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        free4All = config.getBoolean("free4All", false);
-    }
-
     //test for a players permissions
     public boolean playerCanUseCommand(Player player, String command) {
         getPermissionsPlugin();
-        if(free4All){
+        if (free4All) {
             return true;
         }
         else if (groupManager != null) {
@@ -92,6 +75,18 @@ public class neoPaintingSwitch extends JavaPlugin {
         else {
             return false;
         }
+    }
+
+    // get worldguard plugin
+    private WorldGuardPlugin getWorldGuard() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+
+        // WorldGuard may not be loaded
+        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) { 
+            return null;
+        }
+
+        return (WorldGuardPlugin) plugin;
     }
 
     // permissions plugin enabled test
@@ -126,7 +121,7 @@ public class neoPaintingSwitch extends JavaPlugin {
             }
             permissionsExPlugin = (PermissionsEx) p;
         }
-        else if(free4All){
+        else if (free4All) {
             if (!permissionsSet) {
                 LOGGER.info("No Permissions, neoPaintingSwitch freeForAll enabled...");
                 permissionsSet = true;

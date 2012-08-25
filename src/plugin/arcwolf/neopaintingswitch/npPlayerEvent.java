@@ -14,12 +14,30 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+
 public class npPlayerEvent implements Listener {
 
     private neoPaintingSwitch plugin;
 
     public npPlayerEvent(neoPaintingSwitch plugin) {
         this.plugin = plugin;
+    }
+
+    private boolean canModifyPainting(Player player, Entity e) {
+        if (plugin.worldguard) {
+            Vector pt = toVector(e.getLocation());
+            LocalPlayer localPlayer = plugin.wgp.wrapPlayer(player);
+
+            RegionManager regionManager = plugin.wgp.getRegionManager(player.getWorld());
+            ApplicableRegionSet set = regionManager.getApplicableRegions(pt);
+            return set.isOwnerOfAll(localPlayer);
+        }
+        return true;
     }
 
     @EventHandler
@@ -29,28 +47,34 @@ public class npPlayerEvent implements Listener {
         Entity entity = event.getRightClicked();
         if (entity instanceof Painting && (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
-            Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
-            for(Entry<String, npSettings> set : keys) {
-                String playerName = set.getKey();
-                if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == entity.getEntityId() && !playerName.equals(player.getName())) {
-                    player.sendMessage(playerName + ChatColor.RED + " is already editing this painting.");
-                    return;
+            if (canModifyPainting(player, entity)) {
+                Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
+                for(Entry<String, npSettings> set : keys) {
+                    String playerName = set.getKey();
+                    if (npSettings.playerSettings.get(playerName).painting != null && npSettings.playerSettings.get(playerName).painting.getEntityId() == entity.getEntityId() && !playerName.equals(player.getName())) {
+                        player.sendMessage(playerName + ChatColor.RED + " is already editing this painting.");
+                        return;
+                    }
+                }
+                npSettings settings = npSettings.getSettings(player);
+                settings.block = player.getTargetBlock(null, 20);
+                settings.painting = (Painting) entity;
+                settings.location = player.getLocation();
+                if (settings.clicked) {
+                    player.sendMessage(ChatColor.RED + "Painting locked");
+                    npSettings.playerSettings.get(player.getName()).painting = null;
+                    npSettings.playerSettings.get(player.getName()).block = null;
+                    npSettings.playerSettings.get(player.getName()).clicked = false;
+                    npSettings.playerSettings.get(player.getName()).location = null;
+                }
+                else {
+                    player.sendMessage(ChatColor.GREEN + "Scroll to change painting");
+                    settings.clicked = true;
                 }
             }
-            npSettings settings = npSettings.getSettings(player);
-            settings.block = player.getTargetBlock(null, 20);
-            settings.painting = (Painting) entity;
-            settings.location = player.getLocation();
-            if (settings.clicked) {
-                player.sendMessage(ChatColor.RED + "Painting locked");
-                npSettings.playerSettings.get(player.getName()).painting = null;
-                npSettings.playerSettings.get(player.getName()).block = null;
-                npSettings.playerSettings.get(player.getName()).clicked = false;
-                npSettings.playerSettings.get(player.getName()).location = null;
-            }
-            else {
-                player.sendMessage(ChatColor.GREEN + "Scroll to change painting");
-                settings.clicked = true;
+            else{
+                player.sendMessage(ChatColor.RED + "This Painting is locked by worldguard.");
+                event.setCancelled(true);
             }
         }
     }
