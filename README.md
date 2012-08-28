@@ -7,27 +7,27 @@ This plugin was originally created by [Edward Hand](http://forums.bukkit.org/mem
 
 Features:
 =========
-* Allows you to scroll through paintings by aiming and right
-clicking at them and using the mouse wheel to scroll through paintings.
+* Allows you to scroll through paintings by aiming and right clicking at them and using the mouse wheel to scroll through paintings.
 * Permissions support "neopaintingswitch.use".
+* Supports worldguard
 
 Version 1.32:
 ============
-Added worldguard support
-Fixed painting dupping bug
+*Added worldguard support
+*Fixed painting dupping bug
 
 Version 1.31:
-updated for bukkit 1.1 and mc 1.1 new event handlers
-also respect for outside event cancel events
+*updated for bukkit 1.1 and mc 1.1 new event handlers
+*also respect for outside event cancel events
 
 Version 1.3:
-PermissionsEx support & new config option to turn off permissions and allow Free For All mode.
+*PermissionsEx support & new config option to turn off permissions and allow Free For All mode.
 
 Version 1.2:
-Significantly reduced the number of calls to getTargetBlock(). Now only calls when precise conditions are met and only once.
+*Significantly reduced the number of calls to getTargetBlock(). Now only calls when precise conditions are met and only once.
 
 Version 1.1
-May have fixed a exception
+*May have fixed a exception
 
 Version 1.0
 * First release.
