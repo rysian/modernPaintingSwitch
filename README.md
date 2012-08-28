@@ -1,4 +1,4 @@
-neoPaintingSwitch 1.31
+neoPaintingSwitch 1.32
 =====================
 
 This plugin uses the same basic idea as located [here](http://forums.bukkit.org/threads/inactive-edit-paintingswitch-v0-1-choose-paintings-with-ease-672.5788/) and [here] (http://forums.bukkit.org/threads/edit-paintingswitch-v0-4-scroll-through-paintings-1185.24604/).
@@ -11,8 +11,12 @@ Features:
 clicking at them and using the mouse wheel to scroll through paintings.
 * Permissions support "neopaintingswitch.use".
 
-Version 1.31:
+Version 1.32:
 ============
+Added worldguard support
+Fixed painting dupping bug
+
+Version 1.31:
 updated for bukkit 1.1 and mc 1.1 new event handlers
 also respect for outside event cancel events
 
