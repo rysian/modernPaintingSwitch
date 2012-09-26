@@ -35,7 +35,7 @@ public class npPlayerEvent implements Listener {
 
             RegionManager regionManager = plugin.wgp.getRegionManager(player.getWorld());
             ApplicableRegionSet set = regionManager.getApplicableRegions(pt);
-            return set.isOwnerOfAll(localPlayer);
+            return set.isOwnerOfAll(localPlayer) || set.isMemberOfAll(localPlayer);
         }
         return true;
     }

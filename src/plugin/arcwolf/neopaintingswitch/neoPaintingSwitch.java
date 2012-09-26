@@ -1,9 +1,12 @@
 package plugin.arcwolf.neopaintingswitch;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.anjocaido.groupmanager.GroupManager;
 import org.bukkit.Server;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -35,6 +38,7 @@ public class neoPaintingSwitch extends JavaPlugin {
         server = this.getServer();
         PluginDescriptionFile pdfFile = getDescription();
         PluginManager pm = getServer().getPluginManager();
+        setupConfig();
         getPermissionsPlugin();
         wgp = getWorldGuard();
         worldguard = wgp != null;
@@ -43,6 +47,20 @@ public class neoPaintingSwitch extends JavaPlugin {
         pm.registerEvents(new npPaintingBreakEvent(), this);
 
         LOGGER.info(pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!");
+    }
+
+    public void setupConfig() {
+        File configFile = new File(this.getDataFolder() + "/config.yml");
+        FileConfiguration config = this.getConfig();
+        if (!configFile.exists()) {
+            config.set("free4All", Boolean.valueOf(false));
+            try {
+                config.save(configFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        free4All = config.getBoolean("free4All", false);
     }
 
     @Override
@@ -82,9 +100,7 @@ public class neoPaintingSwitch extends JavaPlugin {
         Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 
         // WorldGuard may not be loaded
-        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) { 
-            return null;
-        }
+        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) { return null; }
 
         return (WorldGuardPlugin) plugin;
     }
