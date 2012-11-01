@@ -196,11 +196,6 @@ public class npPlayerEvent implements Listener {
                 int count = painting.getArt().getId();
                 int tempCount = count;
                 count++;
-                /* Bukkit Bug workaround for new painting in 1.4
-                 * https://bukkit.atlassian.net/browse/BUKKIT-2667
-                 */
-                if(count==19)count++;
-                //-----------------------------------------------
                 while (!painting.setArt(art[count])) {
                     if (count == art.length - 1)
                         count = 0;
@@ -225,11 +220,6 @@ public class npPlayerEvent implements Listener {
                 int count = painting.getArt().getId();
                 int tempCount = count;
                 count--;
-                /* Bukkit Bug workaround for new painting in 1.4
-                 * https://bukkit.atlassian.net/browse/BUKKIT-2667
-                 */
-                if(count==19)count--;
-               //-----------------------------------------------
                 while (!painting.setArt(art[count])) {
                     if (count == 0)
                         count = art.length - 1;
