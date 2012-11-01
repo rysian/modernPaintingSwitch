@@ -28,14 +28,23 @@ public class npPlayerEvent implements Listener {
         this.plugin = plugin;
     }
 
+    // Updated WG support
+    // Code pull from BangL (https://github.com/BangL)
+    // https://github.com/arcwolf/neoPaintingSwitch/pull/1
+    //
     private boolean canModifyPainting(Player player, Entity e) {
-        if (plugin.worldguard) {
+        // First check for op ...
+        if (!player.isOp()
+                // ... if not, check if WorldGuardPlugin existant ...
+                && plugin.worldguard
+                // ... if yes, then check if player can build in any region anyways.
+                && !plugin.playerCanUseCommand(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
             Vector pt = toVector(e.getLocation());
             LocalPlayer localPlayer = plugin.wgp.wrapPlayer(player);
 
             RegionManager regionManager = plugin.wgp.getRegionManager(player.getWorld());
             ApplicableRegionSet set = regionManager.getApplicableRegions(pt);
-            return set.isOwnerOfAll(localPlayer) || set.isMemberOfAll(localPlayer);
+            return set.canBuild(localPlayer);
         }
         return true;
     }
@@ -187,6 +196,11 @@ public class npPlayerEvent implements Listener {
                 int count = painting.getArt().getId();
                 int tempCount = count;
                 count++;
+                /* Bukkit Bug workaround for new painting in 1.4
+                 * https://bukkit.atlassian.net/browse/BUKKIT-2667
+                 */
+                if(count==19)count++;
+                //-----------------------------------------------
                 while (!painting.setArt(art[count])) {
                     if (count == art.length - 1)
                         count = 0;
@@ -211,6 +225,11 @@ public class npPlayerEvent implements Listener {
                 int count = painting.getArt().getId();
                 int tempCount = count;
                 count--;
+                /* Bukkit Bug workaround for new painting in 1.4
+                 * https://bukkit.atlassian.net/browse/BUKKIT-2667
+                 */
+                if(count==19)count--;
+               //-----------------------------------------------
                 while (!painting.setArt(art[count])) {
                     if (count == 0)
                         count = art.length - 1;
