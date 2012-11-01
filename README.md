@@ -1,4 +1,4 @@
-neoPaintingSwitch 1.321
+neoPaintingSwitch 1.33
 =====================
 
 This plugin uses the same basic idea as located [here](http://forums.bukkit.org/threads/inactive-edit-paintingswitch-v0-1-choose-paintings-with-ease-672.5788/) and [here] (http://forums.bukkit.org/threads/edit-paintingswitch-v0-4-scroll-through-paintings-1185.24604/).
@@ -11,8 +11,13 @@ Features:
 * Permissions support "neopaintingswitch.use".
 * Supports worldguard
 
-Version 1.321:
+Version 1.33
 ============
+* Updated for MC1.4 and replaced deprecated methods
+* Incorporated WG pull request from BangL
+
+Version 1.321:
+
 * Added worldguard support for members of a region not just owners.
 * Fixed config bug
 
