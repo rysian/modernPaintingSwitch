@@ -1,5 +1,6 @@
 package plugin.arcwolf.neopaintingswitch;
 
+import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -10,6 +11,7 @@ import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -35,7 +37,7 @@ public class npPlayerEvent implements Listener {
     private boolean canModifyPainting(Player player, Entity e) {
         // First check for op ...
         if (!player.isOp()
-                // ... if not, check if WorldGuardPlugin existant ...
+                // ... if not, check if WorldGuardPlugin existent ...
                 && plugin.worldguard
                 // ... if yes, then check if player can build in any region anyways.
                 && !plugin.playerCanUseCommand(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
@@ -47,6 +49,33 @@ public class npPlayerEvent implements Listener {
             return set.canBuild(localPlayer);
         }
         return true;
+    }
+
+    @EventHandler
+    public void onHangingPlace(HangingPlaceEvent event) {
+        if (event.isCancelled())
+            return;
+        if (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All) {
+            Player player = event.getPlayer();
+            npSettings settings = npSettings.getSettings(player);
+            if (settings.previousPainting != null && event.getEntity() instanceof Painting) {
+                Painting painting = (Painting) event.getEntity();
+                if (!painting.setArt(settings.previousPainting.getArt())) {
+                    Art[] art = Art.values();
+                    int count = new Random().nextInt(Art.values().length - 1);
+                    int tempCount = count;
+                    count--;
+                    if (count == -1) count = 0;
+                    while (!painting.setArt(art[count])) {
+                        if (count == 0)
+                            count = art.length - 1;
+                        else
+                            count--;
+                        if (count == tempCount) break;
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -81,7 +110,7 @@ public class npPlayerEvent implements Listener {
                     settings.clicked = true;
                 }
             }
-            else{
+            else {
                 player.sendMessage(ChatColor.RED + "This Painting is locked by worldguard.");
                 event.setCancelled(true);
             }
@@ -204,6 +233,7 @@ public class npPlayerEvent implements Listener {
                     if (count == tempCount) break;
                 }
             }
+            settings.previousPainting = painting;
         }
         else if (settings.clicked && settings.painting != null && settings.block != null && reverse) {
             Painting painting = settings.painting;
@@ -228,6 +258,7 @@ public class npPlayerEvent implements Listener {
                     if (count == tempCount) break;
                 }
             }
+            settings.previousPainting = painting;
         }
     }
 }

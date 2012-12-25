@@ -13,6 +13,7 @@ public class npSettings {
     public boolean clicked = false;
     public Block block = null;
     public Painting painting = null;
+    public Painting previousPainting = null;
     public Location location = null;
     
     public static npSettings getSettings(Player player){
