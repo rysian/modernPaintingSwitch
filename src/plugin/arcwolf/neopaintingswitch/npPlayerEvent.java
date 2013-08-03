@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -40,7 +41,7 @@ public class npPlayerEvent implements Listener {
                 // ... if not, check if WorldGuardPlugin existent ...
                 && plugin.worldguard
                 // ... if yes, then check if player can build in any region anyways.
-                && !plugin.playerCanUseCommand(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
+                && !plugin.playerHasPermission(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
             Vector pt = toVector(e.getLocation());
             LocalPlayer localPlayer = plugin.wgp.wrapPlayer(player);
 
@@ -51,11 +52,11 @@ public class npPlayerEvent implements Listener {
         return true;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onHangingPlace(HangingPlaceEvent event) {
         if (event.isCancelled())
             return;
-        if (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All) {
+        if (plugin.playerHasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All) {
             Player player = event.getPlayer();
             npSettings settings = npSettings.getSettings(player);
             if (settings.previousPainting != null && event.getEntity() instanceof Painting) {
@@ -78,12 +79,12 @@ public class npPlayerEvent implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.isCancelled())
             return;
         Entity entity = event.getRightClicked();
-        if (entity instanceof Painting && (plugin.playerCanUseCommand(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
+        if (entity instanceof Painting && (plugin.playerHasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
             if (canModifyPainting(player, entity)) {
                 Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
@@ -100,10 +101,7 @@ public class npPlayerEvent implements Listener {
                 settings.location = player.getLocation();
                 if (settings.clicked) {
                     player.sendMessage(ChatColor.RED + "Painting locked");
-                    npSettings.playerSettings.get(player.getName()).painting = null;
-                    npSettings.playerSettings.get(player.getName()).block = null;
-                    npSettings.playerSettings.get(player.getName()).clicked = false;
-                    npSettings.playerSettings.get(player.getName()).location = null;
+                    npSettings.clear(player);
                 }
                 else {
                     player.sendMessage(ChatColor.GREEN + "Scroll to change painting");
@@ -117,7 +115,7 @@ public class npPlayerEvent implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (event.isCancelled())
             return;
@@ -126,10 +124,7 @@ public class npPlayerEvent implements Listener {
         try {
             if (settings.block != null && settings.location != null && settings.clicked && hasPlayerMovedSignificantly(event)) {
                 player.sendMessage(ChatColor.RED + "Painting locked");
-                npSettings.playerSettings.get(player.getName()).painting = null;
-                npSettings.playerSettings.get(player.getName()).block = null;
-                npSettings.playerSettings.get(player.getName()).clicked = false;
-                npSettings.playerSettings.get(player.getName()).location = null;
+                npSettings.clear(player);
             }
         } catch (Exception e) {
             // Do Nothing
@@ -184,8 +179,7 @@ public class npPlayerEvent implements Listener {
             oldPlayerPitch = newPlayerPitch;
             newPlayerPitch = temp;
         }
-        if ((oldPlayerPitch - newPlayerPitch) > 30) { return true; }
-        return false;
+        return (oldPlayerPitch - newPlayerPitch) > 30;
     }
 
     private boolean hasYawChangedSignificantly(int oldYaw, int newYaw) {
@@ -196,11 +190,10 @@ public class npPlayerEvent implements Listener {
             oldYaw = newYaw;
             newYaw = temp;
         }
-        if (oldYaw % newYaw > 30) { return true; }
-        return false;
+        return (oldYaw % newYaw) > 30;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
