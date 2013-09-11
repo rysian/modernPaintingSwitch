@@ -45,7 +45,7 @@ public class npPlayerEvent implements Listener {
                 // ... if not, check if WorldGuardPlugin existent ...
                 && plugin.worldguard
                 // ... if yes, then check if player can build in any region anyways.
-                && !plugin.playerHasPermission(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
+                && !plugin.hasPermission(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
             Vector pt = toVector(e.getLocation());
             LocalPlayer localPlayer = plugin.wgp.wrapPlayer(player);
 
@@ -60,7 +60,7 @@ public class npPlayerEvent implements Listener {
     public void onHangingPlace(HangingPlaceEvent event) {
         if (event.isCancelled())
             return;
-        if (plugin.playerHasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All) {
+        if (plugin.hasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All) {
             Player player = event.getPlayer();
             npSettings settings = npSettings.getSettings(player);
             if (settings.previousPainting != null && event.getEntity() instanceof Painting) {
@@ -88,7 +88,7 @@ public class npPlayerEvent implements Listener {
         if (event.isCancelled())
             return;
         Entity entity = event.getRightClicked();
-        if (entity instanceof Painting && (plugin.playerHasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
+        if (entity instanceof Painting && (plugin.hasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
             if (canModifyPainting(player, entity)) {
                 Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();

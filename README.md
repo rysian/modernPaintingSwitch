@@ -1,4 +1,4 @@
-neoPaintingSwitch 1.34
+neoPaintingSwitch 1.35
 =====================
 
 This plugin uses the same basic idea as located [here](http://forums.bukkit.org/threads/inactive-edit-paintingswitch-v0-1-choose-paintings-with-ease-672.5788/) and [here] (http://forums.bukkit.org/threads/edit-paintingswitch-v0-4-scroll-through-paintings-1185.24604/).
@@ -12,12 +12,19 @@ Features:
 * Permissions support "neopaintingswitch.use".
 * Supports worldguard
 
-Version 1.34
+Version 1.35
 ============
+* added bPermissions and Vault permissions support
+* updated event priorities to be friendlier to other plugins
+* small code changes to internal player data storage
+* other misc changes
+* Removed deprecated method calls
+* Ops overrides permissions
+
+Version 1.34
 * Plugin now remembers what painting was last used and attempts to use it for future placed paintings
 
 Version 1.33
-
 * Updated for MC1.4 and replaced deprecated methods
 * Incorporated WG pull request from BangL
 
