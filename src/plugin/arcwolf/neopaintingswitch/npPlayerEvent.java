@@ -6,6 +6,9 @@ import java.util.Map.Entry;
 
 import org.bukkit.Art;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -16,6 +19,7 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.BlockIterator;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -96,7 +100,8 @@ public class npPlayerEvent implements Listener {
                     }
                 }
                 npSettings settings = npSettings.getSettings(player);
-                settings.block = player.getTargetBlock(null, 20);
+                //settings.block = player.getTargetBlock(null, 20); //TODO
+                settings.block = getTargetBlock(player, 20);
                 settings.painting = (Painting) entity;
                 settings.location = player.getLocation();
                 if (settings.clicked) {
@@ -160,17 +165,38 @@ public class npPlayerEvent implements Listener {
         int oldPlayerPitch = (int) settings.location.getPitch();
         int newPlayerPitch = (int) player.getLocation().getPitch();
         if (hasYawChangedSignificantly(oldPlayerYaw, newPlayerYaw) || hasPitchChangedSignificantly(oldPlayerPitch, newPlayerPitch)) {
-            if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; }
+            //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
+            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
         }
         if (((newPlayerYaw <= 315 && newPlayerYaw >= 225) || (newPlayerYaw <= 135 && newPlayerYaw >= 45)) &&
                 ((oldPlayerPosX % newPlayerPosX > 7) || (oldPlayerPosY % newPlayerPosY > 2) || (oldPlayerPosZ % newPlayerPosZ > 2))) { // -X or +X direction
-            if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; }
+            //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
+            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
         }
         if (((newPlayerYaw < 45 || newPlayerYaw > 315) || (newPlayerYaw < 225 && newPlayerYaw > 135)) &&
                 ((oldPlayerPosX % newPlayerPosX > 2) || (oldPlayerPosY % newPlayerPosY > 2) || (oldPlayerPosZ % newPlayerPosZ > 7))) { // -Z or +Z direction
-            if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; }
+            //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
+            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
         }
         return false;
+    }
+
+    private Block getTargetBlock(Player player, int distance) {
+        Block target = player.getEyeLocation().getBlock();
+        Location eyeLoc = player.getEyeLocation();
+        try {
+            BlockIterator lineOfSight = new BlockIterator(player.getWorld(), eyeLoc.toVector(), player.getLocation().getDirection(), 0, distance);
+            while (lineOfSight.hasNext()) {
+                Block toTest = lineOfSight.next();
+                if (toTest.getType() != Material.AIR)
+                    return target;
+                else
+                    target = toTest;
+            }
+        } catch (Exception e) {
+            //Do nothing
+        }
+        return target;
     }
 
     private boolean hasPitchChangedSignificantly(int oldPlayerPitch, int newPlayerPitch) {
@@ -206,7 +232,7 @@ public class npPlayerEvent implements Listener {
         if (settings.clicked && settings.painting != null && settings.block != null && !reverse) {
             Painting painting = settings.painting;
             Art[] art = Art.values();
-            int currentID = painting.getArt().getId();
+            int currentID = painting.getArt().ordinal();
             if (currentID == art.length - 1) {
                 int count = 0;
                 while (!painting.setArt(art[count])) {
@@ -215,7 +241,7 @@ public class npPlayerEvent implements Listener {
                 }
             }
             else {
-                int count = painting.getArt().getId();
+                int count = painting.getArt().ordinal();
                 int tempCount = count;
                 count++;
                 while (!painting.setArt(art[count])) {
@@ -231,7 +257,7 @@ public class npPlayerEvent implements Listener {
         else if (settings.clicked && settings.painting != null && settings.block != null && reverse) {
             Painting painting = settings.painting;
             Art[] art = Art.values();
-            int currentID = painting.getArt().getId();
+            int currentID = painting.getArt().ordinal();
             if (currentID == 0) {
                 int count = art.length - 1;
                 while (!painting.setArt(art[count])) {
@@ -240,7 +266,7 @@ public class npPlayerEvent implements Listener {
                 }
             }
             else {
-                int count = painting.getArt().getId();
+                int count = painting.getArt().ordinal();
                 int tempCount = count;
                 count--;
                 while (!painting.setArt(art[count])) {
