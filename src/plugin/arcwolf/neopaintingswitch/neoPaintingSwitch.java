@@ -95,18 +95,15 @@ public class neoPaintingSwitch extends JavaPlugin {
 
     public boolean hasPermission(Player player, String permission) {
         getPermissionsPlugin();
-        if (vaultPerms != null) {
-            if (debug == 1) {
+        if (debug == 1) {
+            if (vaultPerms != null) {
                 String pName = player.getName();
                 String gName = vaultPerms.getPrimaryGroup(player);
                 Boolean permissions = vaultPerms.has(player, permission);
                 LOGGER.info("Vault permissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("Permission for " + permission + " is " + permissions);
             }
-            return vaultPerms.has(player, permission) || player.isOp() || player.hasPermission(permission);
-        }
-        else if (groupManager != null) {
-            if (debug == 1) {
+            else if (groupManager != null) {
                 String pName = player.getName();
                 String gName = groupManager.getWorldsHolder().getWorldData(player.getWorld().getName()).getPermissionsHandler().getGroup(player.getName());
                 Boolean permissions = groupManager.getWorldsHolder().getWorldPermissions(player).has(player, permission);
@@ -115,10 +112,7 @@ public class neoPaintingSwitch extends JavaPlugin {
                 LOGGER.info("");
                 LOGGER.info("permissions available to '" + pName + "' = " + groupManager.getWorldsHolder().getWorldData(player.getWorld().getName()).getGroup(gName).getPermissionList());
             }
-            return groupManager.getWorldsHolder().getWorldPermissions(player).has(player, permission) || player.isOp() || player.hasPermission(permission);
-        }
-        else if (permissionsPlugin != null) {
-            if (debug == 1) {
+            else if (permissionsPlugin != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String gName = Permissions.Security.getGroup(wName, pName);
@@ -126,10 +120,7 @@ public class neoPaintingSwitch extends JavaPlugin {
                 LOGGER.info("Niji permissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("Permission for " + permission + " is " + permissions);
             }
-            return (Permissions.Security.permission(player, permission)) || player.isOp() || player.hasPermission(permission);
-        }
-        else if (permissionsExPlugin != null) {
-            if (debug == 1) {
+            else if (permissionsExPlugin != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String[] gNameA = PermissionsEx.getUser(player).getGroupsNames(wName);
@@ -141,10 +132,7 @@ public class neoPaintingSwitch extends JavaPlugin {
                 LOGGER.info("PermissionsEx permissions, group for '" + pName + "' = " + gName.toString());
                 LOGGER.info("Permission for " + permission + " is " + permissions);
             }
-            return (PermissionsEx.getPermissionManager().has(player, permission)) || player.isOp() || player.hasPermission(permission);
-        }
-        else if (bPermissions != null) {
-            if (debug == 1) {
+            else if (bPermissions != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String[] gNameA = ApiLayer.getGroups(wName, CalculableType.USER, pName);
@@ -156,26 +144,17 @@ public class neoPaintingSwitch extends JavaPlugin {
                 LOGGER.info("bPermissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("bPermission for " + permission + " is " + permissions);
             }
-            return bPermissions.has(player, permission) || player.isOp() || player.hasPermission(permission);
-        }
-        else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null && player.hasPermission(permission)) {
-            if (debug == 1) {
+            else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
                 LOGGER.info("Bukkit Permissions " + permission + " " + player.hasPermission(permission));
             }
-            return true;
-        }
-        else if (permissionsEr && (player.isOp() || player.hasPermission(permission))) {
-            if (debug == 1) {
+            else if (permissionsEr && (player.isOp() || player.hasPermission(permission))) {
                 LOGGER.info("Unknown permissions plugin " + permission + " " + player.hasPermission(permission));
             }
-            return true;
-        }
-        else {
-            if (debug == 1 && permissionsEr == true) {
+            else {
                 LOGGER.info("Unknown permissions plugin " + permission + " " + player.hasPermission(permission));
             }
-            return false || player.isOp() || player.hasPermission(permission);
         }
+        return player.isOp() || player.hasPermission(permission);
     }
 
     // permissions plugin enabled test

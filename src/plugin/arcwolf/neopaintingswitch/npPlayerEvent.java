@@ -1,5 +1,6 @@
 package plugin.arcwolf.neopaintingswitch;
 
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -10,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -101,7 +103,7 @@ public class npPlayerEvent implements Listener {
                 }
                 npSettings settings = npSettings.getSettings(player);
                 //settings.block = player.getTargetBlock(null, 20); //TODO
-                settings.block = getTargetBlock(player, 20);
+                settings.block = getTargetBlock(player, null, 20);
                 settings.painting = (Painting) entity;
                 settings.location = player.getLocation();
                 if (settings.clicked) {
@@ -166,29 +168,46 @@ public class npPlayerEvent implements Listener {
         int newPlayerPitch = (int) player.getLocation().getPitch();
         if (hasYawChangedSignificantly(oldPlayerYaw, newPlayerYaw) || hasPitchChangedSignificantly(oldPlayerPitch, newPlayerPitch)) {
             //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
-            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
+            if (!settings.block.equals(getTargetBlock(player, null, 15))) { return true; }
         }
         if (((newPlayerYaw <= 315 && newPlayerYaw >= 225) || (newPlayerYaw <= 135 && newPlayerYaw >= 45)) &&
                 ((oldPlayerPosX % newPlayerPosX > 7) || (oldPlayerPosY % newPlayerPosY > 2) || (oldPlayerPosZ % newPlayerPosZ > 2))) { // -X or +X direction
             //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
-            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
+            if (!settings.block.equals(getTargetBlock(player, null, 15))) { return true; }
         }
         if (((newPlayerYaw < 45 || newPlayerYaw > 315) || (newPlayerYaw < 225 && newPlayerYaw > 135)) &&
                 ((oldPlayerPosX % newPlayerPosX > 2) || (oldPlayerPosY % newPlayerPosY > 2) || (oldPlayerPosZ % newPlayerPosZ > 7))) { // -Z or +Z direction
             //if (!settings.block.equals(player.getTargetBlock(null, 15))) { return true; } //TODO
-            if (!settings.block.equals(getTargetBlock(player, 15))) { return true; }
+            if (!settings.block.equals(getTargetBlock(player, null, 15))) { return true; }
         }
         return false;
     }
 
-    private Block getTargetBlock(Player player, int distance) {
-        Block target = player.getEyeLocation().getBlock();
-        Location eyeLoc = player.getEyeLocation();
+    /**
+     * Gets the block that the living entity has targeted.
+     * 
+     * @param LivingEntity
+     *            this is the entity to get target block
+     * @param transparent
+     *            HashSet containing all transparent block Materials (set to
+     *            null for only air)
+     * @param maxDistance
+     *            this is the maximum distance to scan (may be limited by server
+     *            by at least 100 blocks, no less)
+     * @return block that the living entity has targeted
+     */
+    private Block getTargetBlock(LivingEntity entity, HashSet<Material> transparent, int maxDistance) {
+        Block target = entity.getEyeLocation().getBlock();
+        Location eyeLoc = entity.getEyeLocation();
+        if(transparent == null){
+            transparent = new HashSet<Material>();
+            transparent.add(Material.AIR);
+        }
         try {
-            BlockIterator lineOfSight = new BlockIterator(player.getWorld(), eyeLoc.toVector(), player.getLocation().getDirection(), 0, distance);
+            BlockIterator lineOfSight = new BlockIterator(entity.getWorld(), eyeLoc.toVector(), entity.getLocation().getDirection(), 0, maxDistance);
             while (lineOfSight.hasNext()) {
                 Block toTest = lineOfSight.next();
-                if (toTest.getType() != Material.AIR)
+                if (!transparent.contains(toTest.getType()))
                     return target;
                 else
                     target = toTest;
