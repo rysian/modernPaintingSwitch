@@ -16,7 +16,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class neoPaintingSwitch extends JavaPlugin {
 
-    public static final Logger LOGGER = Logger.getLogger("Minecraft.neoPaintingSwitch");
+    public static final Logger LOGGER = Logger.getLogger("Minecraft.modernPaintingSwitch");
     public WorldGuardPlugin wgp;
 
     public boolean free4All = false;

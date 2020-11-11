@@ -5,10 +5,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.bukkit.Art;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -21,13 +23,13 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.BlockIterator;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class npPlayerEvent implements Listener {
 
@@ -48,15 +50,20 @@ public class npPlayerEvent implements Listener {
                 && plugin.worldguard
                 // ... if yes, then check if player can build in any region anyways.
                 && !plugin.hasPermission(player, "worldguard.region.bypass." + player.getWorld().getName().toLowerCase())) {
-            Vector pt = toVector(e.getLocation());
+            BlockVector3 pt = BlockVector3.at(e.getLocation().toVector().getX(), e.getLocation().toVector().getY(), e.getLocation().toVector().getZ());
             LocalPlayer localPlayer = plugin.wgp.wrapPlayer(player);
 
-            RegionManager regionManager = plugin.wgp.getRegionManager(player.getWorld());
-            ApplicableRegionSet set = regionManager.getApplicableRegions(pt);
-            return set.canBuild(localPlayer);
+            WorldGuardPlatform platform = WorldGuard.getInstance().getPlatform();
+            RegionContainer container = platform.getRegionContainer();
+            RegionManager regionManager = container.get(BukkitAdapter.adapt(player.getWorld()));
+            assert regionManager != null;
+                ApplicableRegionSet set = regionManager.getApplicableRegions(pt);
+            return set.testState(localPlayer, Flags.BUILD);
         }
         return true;
     }
+
+
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHangingPlace(HangingPlaceEvent event) {
@@ -90,7 +97,7 @@ public class npPlayerEvent implements Listener {
         if (event.isCancelled())
             return;
         Entity entity = event.getRightClicked();
-        if (entity instanceof Painting && (plugin.hasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
+        if ((event.getHand().equals(EquipmentSlot.HAND)) && entity instanceof Painting && (plugin.hasPermission(event.getPlayer(), "neopaintingswitch.use") || plugin.free4All)) {
             Player player = event.getPlayer();
             if (canModifyPainting(player, entity)) {
                 Set<Entry<String, npSettings>> keys = npSettings.playerSettings.entrySet();
@@ -106,9 +113,11 @@ public class npPlayerEvent implements Listener {
                 settings.block = getTargetBlock(player, null, 20);
                 settings.painting = (Painting) entity;
                 settings.location = player.getLocation();
+
                 if (settings.clicked) {
                     player.sendMessage(ChatColor.RED + "Painting locked");
                     npSettings.clear(player);
+
                 }
                 else {
                     player.sendMessage(ChatColor.GREEN + "Scroll to change painting");
@@ -138,6 +147,7 @@ public class npPlayerEvent implements Listener {
         }
     }
 
+
     private boolean hasPlayerMovedSignificantly(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         npSettings settings = npSettings.getSettings(player);
@@ -162,6 +172,7 @@ public class npPlayerEvent implements Listener {
             oldPlayerPosZ = newPlayerPosZ;
             newPlayerPosZ = temp;
         }
+
         int oldPlayerYaw = (int) Math.abs(settings.location.getYaw());
         int newPlayerYaw = (int) Math.abs(player.getLocation().getYaw());
         int oldPlayerPitch = (int) settings.location.getPitch();
@@ -186,7 +197,7 @@ public class npPlayerEvent implements Listener {
     /**
      * Gets the block that the living entity has targeted.
      * 
-     * @param LivingEntity
+     * @param entity
      *            this is the entity to get target block
      * @param transparent
      *            HashSet containing all transparent block Materials (set to
@@ -224,7 +235,7 @@ public class npPlayerEvent implements Listener {
             oldPlayerPitch = newPlayerPitch;
             newPlayerPitch = temp;
         }
-        return (oldPlayerPitch - newPlayerPitch) > 30;
+        return (oldPlayerPitch - newPlayerPitch) > 40;
     }
 
     private boolean hasYawChangedSignificantly(int oldYaw, int newYaw) {
@@ -235,7 +246,7 @@ public class npPlayerEvent implements Listener {
             oldYaw = newYaw;
             newYaw = temp;
         }
-        return (oldYaw % newYaw) > 30;
+        return (oldYaw % newYaw) > 90;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

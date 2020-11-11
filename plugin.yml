@@ -1,6 +1,8 @@
-name: neoPaintingSwitch
+name: modernPaintingSwitch
 main: plugin.arcwolf.neopaintingswitch.neoPaintingSwitch
-version: 1.35
+version: 1.36
+api-version: 1.16
+softdepend: [WorldEdit, WorldGuard]
 permissions:
     neopaintingswitch.*:
         description: Wildcard option for comfort.
